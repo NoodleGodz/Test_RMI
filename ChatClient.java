@@ -37,6 +37,7 @@ public class ChatClient {
 	public static TextArea		text;
 	public static TextField		data;
 	public static Frame 		frame;
+	public static String serverhost,myhost;
 	public static boolean login;
 	public static Button write_button,who_button,leave_button,enter_button,attach_button;
 
@@ -52,7 +53,8 @@ public class ChatClient {
 		}
 		port = argv[0];
 		myName = argv[1];
-
+		serverhost= "192.168.1.3";
+		myhost= "192.168.1.3";
 		// creation of the GUI 
 		frame=new Frame();
 		FlowLayout fLayout = new FlowLayout();
@@ -129,7 +131,7 @@ public class ChatClient {
 
 	public static void enter(String username) {
 		try {
-			ChatServer cServer = (ChatServer) Naming.lookup("//localhost:"+port+"/messenger");
+			ChatServer cServer = (ChatServer) Naming.lookup("//"+serverhost+":"+port+"/messenger");
 			Callback callback = new CallbackImpl();
 			cServer.enter(username,callback);
 			login=true;
@@ -155,7 +157,7 @@ public class ChatClient {
 	
 	public static void leave(String username) {
 		try {
-			ChatServer cServer = (ChatServer) Naming.lookup("//localhost:"+port+"/messenger");
+			ChatServer cServer = (ChatServer) Naming.lookup("//"+serverhost+":"+port+"/messenger");
 			cServer.leave(username);
 			login=false;
 			write_button.setEnabled(false);
@@ -182,7 +184,7 @@ public class ChatClient {
 	public static void who() {
 		String[] aStrings;
 		try {
-			ChatServer cServer = (ChatServer) Naming.lookup("//localhost:"+port+"/messenger");
+			ChatServer cServer = (ChatServer) Naming.lookup("//"+serverhost+":"+port+"/messenger");
 			aStrings = cServer.who();
 			String text = "active users: \n"+combineString(aStrings);
 			print("server", text);
@@ -195,7 +197,7 @@ public class ChatClient {
 	public static void write(String username, String text) {
 		try {
 			data.setText("");
-			ChatServer cServer = (ChatServer) Naming.lookup("//localhost:"+port+"/messenger");
+			ChatServer cServer = (ChatServer) Naming.lookup("//"+serverhost+":"+port+"/messenger");
 			cServer.write(username,text);
 			
 		} catch (Exception e) {
@@ -319,14 +321,14 @@ public class ChatClient {
 		public void run() {
 			try {
 				attach_button.setEnabled(false);
-				ChatServer cServer = (ChatServer) Naming.lookup("//localhost:"+port+"/messenger");
+				ChatServer cServer = (ChatServer) Naming.lookup("//"+serverhost+":"+port+"/messenger");
 				ServerSocket sSocket = new ServerSocket(0);
 				String sport = String.valueOf(sSocket.getLocalPort()); 
 				int numofclient = cServer.who().length-1;
 				File fileToSend = new File(direct+filename);
 				print("server", "Uploading "+filename+"\n");
 				System.out.println("TCP started on port " + sport);
-				String[] socketinfo = {"localhost",sport};
+				String[] socketinfo = {myhost,sport};
 				String[] info= {filename, String.valueOf(fileToSend.length()/ 1024)};
 				cServer.attach(ChatClient.myName,socketinfo,info);
 	

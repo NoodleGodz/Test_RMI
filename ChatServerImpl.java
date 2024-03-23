@@ -1,5 +1,4 @@
-import java.lang.reflect.Array;
-import java.net.InetAddress;
+
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -69,20 +68,19 @@ public class ChatServerImpl extends UnicastRemoteObject implements ChatServer {
             }
         
         try {
+            String host = "localhost";
+            host = "192.168.1.3";
             LocateRegistry.createRegistry(port);
-            String URL = "//localhost:"+port+"/messenger";
-            InetAddress ip = InetAddress.getLocalHost();
-            String ipAddress = ip.getHostAddress();
-            System.out.println("Server running on " + ipAddress + " on port " + port);
+            String URL = "//"+host+":"+port+"/messenger";
+            System.out.println("Server running on "+host+" on port " + port);
             ChatServer obj = new ChatServerImpl();
             Naming.rebind(URL, obj);
             System.out.println(" ChatServer is online...\n");
 
-        } catch (RemoteException e) {
-
-            e.printStackTrace();
-        } catch (Exception e) {
-
+        }
+        catch (Exception e) {
+            System.out.println(" Something is wrong...\n");    
+            System.exit(0);
             e.printStackTrace();
         }
 
